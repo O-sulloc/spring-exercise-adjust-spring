@@ -85,9 +85,9 @@ public class UserDao {
 
         PreparedStatement ps = c.prepareStatement("select count(*) from users");
         ResultSet rs = ps.executeQuery();
+        rs.next();
 
         int count = rs.getInt(1);
-        rs.next();
         ps.close();
         c.close();
 
