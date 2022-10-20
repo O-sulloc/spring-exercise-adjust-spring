@@ -23,9 +23,16 @@ class UserDaoTest {
 
     UserDao userDao;
 
+    User user1;
+    User user2;
+    User user3;
+
     @BeforeEach
     void setUp(){
         this.userDao = context.getBean("awsUserDao", UserDao.class); //테스트에서 공통적으로 반복되는 코드임. 그래서 빼서 beforeEach로 만듬.
+        this.user1 = new User("1", "김정현", "1234");
+        this.user2 = new User("2", "kjh", "5678");
+        this.user3 = new User("3", "kkk", "9012");
     }
 
     @Test
@@ -50,9 +57,6 @@ class UserDaoTest {
 
     @Test
     void count() throws SQLException {
-        User user1 = new User("1", "김정현", "1234");
-        User user2 = new User("2", "kjh", "5678");
-        User user3 = new User("3", "kkk", "9012");
 
         //UserDao userDao = context.getBean("awsUserDao", UserDao.class);
 
