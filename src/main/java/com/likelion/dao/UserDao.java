@@ -78,27 +78,64 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        Connection c = cm.makeConnection();
+        Connection c = null;
+        PreparedStatement ps = null;
 
-        PreparedStatement ps = c.prepareStatement("delete from users");
-        ps.executeUpdate();
+        try {
+            c = cm.makeConnection();
+            ps = c.prepareStatement("delete from users");
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            //에러가 나도 finally 블록에 있는 코드는 실행됨.
 
-        ps.close();
-        c.close();
+            if (ps != null) {
+                //null이 아니면 ps의 리소스 반환. 이것도 예외 처리
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
     }
 
     public int getCount() throws SQLException {
-        Connection c = cm.makeConnection();
+        Connection c = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            c = cm.makeConnection();
+            ps = c.prepareStatement("select count(*) from users");
+            rs = ps.executeQuery();
 
-        PreparedStatement ps = c.prepareStatement("select count(*) from users");
-        ResultSet rs = ps.executeQuery();
-        rs.next();
+            rs.next();
+            return rs.getInt(1);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            if (ps != null) {
+                //null이 아니면 ps의 리소스 반환. 이것도 예외 처리
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
 
-        int count = rs.getInt(1);
-        ps.close();
-        c.close();
-
-        return count;
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
     }
 
     public static void main(String[] args) {
