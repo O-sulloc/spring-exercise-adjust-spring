@@ -1,10 +1,12 @@
 package com.likelion.dao;
 
 import com.likelion.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -19,11 +21,18 @@ class UserDaoTest {
     @Autowired
     ApplicationContext context;
 
+    UserDao userDao;
+
+    @BeforeEach
+    void setUp(){
+        this.userDao = context.getBean("awsUserDao", UserDao.class); //테스트에서 공통적으로 반복되는 코드임. 그래서 빼서 beforeEach로 만듬.
+    }
+
     @Test
     void addAndGet() throws SQLException {
         User user1 = new User("1", "김정현", "1234");
 
-        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        //UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCount());
 
@@ -45,7 +54,8 @@ class UserDaoTest {
         User user2 = new User("2", "kjh", "5678");
         User user3 = new User("3", "kkk", "9012");
 
-        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        //UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+
         userDao.deleteAll();
         assertEquals(0, userDao.getCount());
 
@@ -56,5 +66,14 @@ class UserDaoTest {
         userDao.add(user3);
         assertEquals(3, userDao.getCount());
 
+    }
+
+    @Test
+    void findById(){
+        assertThrows(EmptyResultDataAccessException.class, ()->{ //오류 처리
+
+            //UserDao userDao = context.getBean("awsUserDao", UserDao.class); //beaforeEach로 만들어줘서 이제 필요없음.
+            userDao.findById("23452345");
+        });
     }
 }

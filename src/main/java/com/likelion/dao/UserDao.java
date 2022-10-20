@@ -2,6 +2,7 @@ package com.likelion.dao;
 
 
 import com.likelion.domain.User;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import javax.xml.transform.Result;
 import java.sql.*;
@@ -55,13 +56,19 @@ public class UserDao {
 
             // Query문 실행
             ResultSet rs = pstmt.executeQuery();
-            rs.next();
-            User user = new User(rs.getString("id"), rs.getString("name"),
-                    rs.getString("password"));
+
+            User user = null; //user 일단 Null로 초기화
+
+            if (rs.next()) {
+                user = new User(rs.getString("id"), rs.getString("name"),
+                        rs.getString("password"));
+            }
 
             rs.close();
             pstmt.close();
             c.close();
+
+            if (user == null) throw new EmptyResultDataAccessException(1);
 
             return user;
 
