@@ -3,12 +3,14 @@ package com.likelion.dao;
 
 import com.likelion.domain.User;
 
+import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Map;
 
 public class UserDao {
 
     private ConnectionMaker cm;
+
     public UserDao() {
         this.cm = new AwsConnectionMaker();
     }
@@ -66,6 +68,30 @@ public class UserDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void deleteAll() throws SQLException {
+        Connection c = cm.makeConnection();
+
+        PreparedStatement ps = c.prepareStatement("delete from users");
+        ps.executeUpdate();
+
+        ps.close();
+        c.close();
+    }
+
+    public int getCount() throws SQLException {
+        Connection c = cm.makeConnection();
+
+        PreparedStatement ps = c.prepareStatement("select count(*) from users");
+        ResultSet rs = ps.executeQuery();
+
+        int count = rs.getInt(1);
+        rs.next();
+        ps.close();
+        c.close();
+
+        return count;
     }
 
     public static void main(String[] args) {
