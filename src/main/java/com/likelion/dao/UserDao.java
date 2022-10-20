@@ -24,7 +24,7 @@ public class UserDao {
             Connection c = cm.makeConnection();
 
             // Query문 작성
-            PreparedStatement pstmt = c.prepareStatement("INSERT INTO users(id, name, password) VALUES(?,?,?);");
+            PreparedStatement pstmt = c.prepareStatement("INSERT INTO users VALUES(?,?,?);");
             pstmt.setString(1, user.getId());
             pstmt.setString(2, user.getName());
             pstmt.setString(3, user.getPassword());
@@ -70,8 +70,8 @@ public class UserDao {
 
     public static void main(String[] args) {
         UserDao userDao = new UserDao();
-//        userDao.add();
-        User user = userDao.findById("6");
+        //userDao.add(new User("id1","name1","pw1"));
+        User user = userDao.findById("id1");
         System.out.println(user.getName());
     }
 }
