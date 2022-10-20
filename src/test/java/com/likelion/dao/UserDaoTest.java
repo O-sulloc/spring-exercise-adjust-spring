@@ -21,35 +21,40 @@ class UserDaoTest {
 
     @Test
     void addAndGet() throws SQLException {
-        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
-        userDao.deleteAll();
-        assertEquals(0,userDao.getCount());
-
-        String id = "id200";
-        userDao.add(new User(id, "name200", "pw300"));
-        assertEquals(1,userDao.getCount());
-
-        User user = userDao.findById(id);
-        //assertEquals("name400", user.getName()); //오류 로그 볼 수 있음
-        //assertEquals("pw100", user.getPassword());
-    }
-
-    @Test
-    void count() throws SQLException{
-        User user1 = new User("1","김정현","1234");
-        User user2 = new User("2","kjh","5678");
-        User user3 = new User("3","kkk","9012");
+        User user1 = new User("1", "김정현", "1234");
 
         UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
         assertEquals(0, userDao.getCount());
 
         userDao.add(user1);
-        assertEquals(1,userDao.getCount());
+        assertEquals(1, userDao.getCount());
+
+        User user = userDao.findById(user1.getId());
+
+        assertEquals(user1.getName(), user.getName());
+        assertEquals(user1.getPassword(), user.getPassword());
+
+        //assertEquals("name400", user.getName()); //오류 로그 볼 수 있음
+        //assertEquals("pw100", user.getPassword());
+    }
+
+    @Test
+    void count() throws SQLException {
+        User user1 = new User("1", "김정현", "1234");
+        User user2 = new User("2", "kjh", "5678");
+        User user3 = new User("3", "kkk", "9012");
+
+        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCount());
+
+        userDao.add(user1);
+        assertEquals(1, userDao.getCount());
         userDao.add(user2);
-        assertEquals(2,userDao.getCount());
+        assertEquals(2, userDao.getCount());
         userDao.add(user3);
-        assertEquals(3,userDao.getCount());
+        assertEquals(3, userDao.getCount());
 
     }
 }
