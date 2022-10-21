@@ -20,6 +20,40 @@ public class UserDao {
         this.cm = cm;
     }
 
+    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws  SQLException{
+        //StatementStrategy를 파라미터로 받음
+        //jdbc try/catch/finally 구조로 만들어진 컨텍스트 내에서 작업을 수행.
+
+        Connection c = null;
+        PreparedStatement ps = null;
+
+        try {
+            c = cm.makeConnection();
+            ps = new DeleteAllStrategy().makePreparedStatement(c);
+            //쿼리는 makePreparedStatement 메서드에 있음
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            //에러가 나도 finally 블록에 있는 코드는 실행됨.
+
+            if (ps != null) {
+                //null이 아니면 ps의 리소스 반환. 이것도 예외 처리
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (SQLException e) {
+                }
+            }
+        }
+    }
     public void add(User user) {
         Map<String, String> env = System.getenv();
         try {
@@ -55,7 +89,7 @@ public class UserDao {
             pstmt.setString(1, id);
 
             // Query문 실행
-            ResultSet rs = pstmt.executeQuery();
+             ResultSet rs = pstmt.executeQuery();
 
             User user = null; //user 일단 Null로 초기화
 
@@ -78,35 +112,11 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException {
-        Connection c = null;
-        PreparedStatement ps = null;
-
-        try {
-            c = cm.makeConnection();
-            ps = new DeleteAllStrategy().makePreparedStatement(c);
-            //쿼리 makePreparedStatement 메서드에 있음
-
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } finally {
-            //에러가 나도 finally 블록에 있는 코드는 실행됨.
-
-            if (ps != null) {
-                //null이 아니면 ps의 리소스 반환. 이것도 예외 처리
-                try {
-                    ps.close();
-                } catch (SQLException e) {
-                }
-            }
-
-            if (c != null) {
-                try {
-                    c.close();
-                } catch (SQLException e) {
-                }
-            }
-        }
+        //요청하는 클라이언트 메서드
+        //여기서 전략 오브젝트를 만들고 컨텍스트를 호출
+        jdbcContextWithStatementStrategy(new DeleteAllStrategy());
+        //삭제하기 위해 deleteallstrategy 전략 클래스를 사용해야함. 해당 클래스의 오브젝트를 NEW로 생성
+        //jdbc컨텍스트를 호출해서 생성한 오브젝트를 전달한다.
     }
 
     public int getCount() throws SQLException {
