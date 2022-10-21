@@ -83,7 +83,9 @@ public class UserDao {
 
         try {
             c = cm.makeConnection();
-            ps = c.prepareStatement("delete from users");
+            ps = new DeleteAllStrategy().makePreparedStatement(c);
+            //쿼리 makePreparedStatement 메서드에 있음
+
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -143,5 +145,16 @@ public class UserDao {
         //userDao.add(new User("id1","name1","pw1"));
         User user = userDao.findById("id1");
         System.out.println(user.getName());
+    }
+
+    public void deleteAll22() throws SQLException {
+        Connection c = cm.makeConnection();
+
+        PreparedStatement ps = c.prepareStatement("delete from users");
+
+        ps.executeUpdate();
+
+        ps.close();
+        c.close();
     }
 }

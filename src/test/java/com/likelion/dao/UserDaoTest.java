@@ -35,7 +35,7 @@ class UserDaoTest {
         this.user3 = new User("3", "kkk", "9012");
     }
 
-    @Test
+    //@Test
     void addAndGet() throws SQLException {
         User user1 = new User("1", "김정현", "1234");
 
@@ -72,7 +72,7 @@ class UserDaoTest {
 
     }
 
-    @Test
+    //@Test
     void findById(){
         assertThrows(EmptyResultDataAccessException.class, ()->{ //오류 처리
 
@@ -80,4 +80,30 @@ class UserDaoTest {
             userDao.findById("23452345");
         });
     }
+
+    //@Test
+    void tobytest() throws SQLException {
+        User user1 = new User("1", "김정현", "1234");
+        User user2 = new User("2", "kjh", "5678");
+        User user3 = new User("3", "kkk", "9012");
+
+        UserDao userDao = context.getBean("awsUserDao", UserDao.class);
+        userDao.deleteAll();
+        assertEquals(0, userDao.getCount()); //db 초기화 + 검증
+
+        userDao.add(user1);
+        assertEquals(1, userDao.getCount());
+
+        userDao.add(user2);
+        assertEquals(2, userDao.getCount());
+
+        userDao.add(user3);
+        assertEquals(3, userDao.getCount());
+
+        User user = userDao.findById(user2.getId());
+
+        assertEquals(user2.getName(), user.getName());
+        assertEquals(user2.getPassword(), user.getPassword());
+    }
+
 }
