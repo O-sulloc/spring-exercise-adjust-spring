@@ -4,7 +4,6 @@ package com.likelion.dao;
 import com.likelion.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Map;
 
@@ -23,13 +22,14 @@ public class UserDao {
     public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws  SQLException{
         //StatementStrategy를 파라미터로 받음
         //jdbc try/catch/finally 구조로 만들어진 컨텍스트 내에서 작업을 수행.
+        //독립된 jdbc 작업 흐름이 담겨있다고 볼 수 있다. dao 메서드(클라이언트)들이 공유할 수 있다.
 
         Connection c = null;
         PreparedStatement ps = null;
 
         try {
             c = cm.makeConnection();
-            ps = new DeleteAllStrategy().makePreparedStatement(c);
+            ps = stmt.makePreparedStatement(c);
             //쿼리는 makePreparedStatement 메서드에 있음
 
             ps.executeUpdate();
@@ -54,27 +54,9 @@ public class UserDao {
             }
         }
     }
-    public void add(User user) {
-        Map<String, String> env = System.getenv();
-        try {
-            // DB접속 (ex sql workbeanch실행)
-            Connection c = cm.makeConnection();
-
-            // Query문 작성
-            PreparedStatement pstmt = new AddStrategy().makePreparedStatement(c);
-            pstmt.setString(1, user.getId());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getPassword());
-
-            // Query문 실행
-            pstmt.executeUpdate();
-
-            pstmt.close();
-            c.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public void add(User user) throws SQLException {
+        AddStrategy addStatement = new AddStrategy(user);
+        jdbcContextWithStatementStrategy(addStatement);
     }
 
     public User findById(String id) {
@@ -150,11 +132,11 @@ public class UserDao {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDao();
         //userDao.add(new User("id1","name1","pw1"));
-        User user = userDao.findById("id1");
-        System.out.println(user.getName());
+        //User user = userDao.findById("id1");
+        //System.out.println(user.getName());
     }
 
     public void deleteAll22() throws SQLException {
