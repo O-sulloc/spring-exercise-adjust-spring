@@ -1,13 +1,18 @@
 package com.likelion.dao;
 
-
 import com.likelion.domain.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Map;
 
 public class UserDao {
+    public DataSource dataSource;
+
+    public UserDao(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     private ConnectionMaker cm;
 
@@ -28,7 +33,7 @@ public class UserDao {
         PreparedStatement ps = null;
 
         try {
-            c = cm.makeConnection();
+            c = dataSource.getConnection();
             ps = stmt.makePreparedStatement(c);
             //쿼리는 makePreparedStatement 메서드에 있음
 
@@ -55,8 +60,11 @@ public class UserDao {
         }
     }
     public void add(User user) throws SQLException {
-        AddStrategy addStatement = new AddStrategy(user);
-        jdbcContextWithStatementStrategy(addStatement);
+        //AddStrategy addStatement = new AddStrategy(user);
+        //jdbcContextWithStatementStrategy(addStatement);
+
+        StatementStrategy st = new AddStrategy(user);
+        jdbcContextWithStatementStrategy(st);
     }
 
     public User findById(String id) {
@@ -134,7 +142,7 @@ public class UserDao {
 
     public static void main(String[] args) throws SQLException {
         UserDao userDao = new UserDao();
-        //userDao.add(new User("id1","name1","pw1"));
+        userDao.add(new User("id1","name1","pw1"));
         //User user = userDao.findById("id1");
         //System.out.println(user.getName());
     }
