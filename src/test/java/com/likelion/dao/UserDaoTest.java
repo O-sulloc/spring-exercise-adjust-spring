@@ -11,6 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,10 +36,22 @@ class UserDaoTest {
         this.user3 = new User("3", "kkk", "9012");
     }
 
-
     @Test
+    void getAllTest() throws SQLException, ClassNotFoundException {
+        userDao.deleteAll();
+
+        List<User> users = userDao.getAll();
+        assertEquals(0, users.size());
+        userDao.add(user1);
+        userDao.add(user2);
+        userDao.add(user3);
+        users = userDao.getAll();
+        assertEquals(3, users.size());
+    }
+
+    //@Test
     void addAndGet() throws SQLException, ClassNotFoundException {
-        User user1 = new User("1", "김정현", "1234");
+        User user1 = new User("2", "김정현", "1234");
 
         UserDao userDao = context.getBean("awsUserDao", UserDao.class);
         userDao.deleteAll();
